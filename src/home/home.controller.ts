@@ -15,4 +15,9 @@ export class HomeController {
     const campaignId = '63042a81c591817931daf36b';
     return this.homeService.findAllByCampaignId(campaignId);
   }
+  @Get('highscore')
+  getHighScore() {
+    const campaignId = '630429cbc591817931daf346';
+    return this.homeService.findPlusByCampaignId(campaignId);
+  }
 }

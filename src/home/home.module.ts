@@ -7,11 +7,12 @@ import { Campaign } from './entities/campaign.entity';
 import { Destination } from './entities/destination.entity';
 import { Room } from './entities/room.entity';
 import { Review } from './entities/review.entity';
+import { Plus } from './entities/plus.entity';
 
 @Module({
   imports: [
     HttpModule,
-    TypeOrmModule.forFeature([Campaign, Destination, Room, Review]),
+    TypeOrmModule.forFeature([Campaign, Destination, Room, Review, Plus]),
   ],
   controllers: [HomeController],
   providers: [HomeService],

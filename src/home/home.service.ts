@@ -6,6 +6,7 @@ import { Campaign } from './entities/campaign.entity';
 import { Destination } from './entities/destination.entity';
 import { Room } from './entities/room.entity';
 import { Review } from './entities/review.entity';
+import { Plus } from './entities/plus.entity';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
@@ -20,6 +21,8 @@ export class HomeService {
     private readonly roomRepository: Repository<Room>,
     @InjectRepository(Review)
     private readonly reviewRepository: Repository<Review>,
+    @InjectRepository(Plus)
+    private readonly plusRepository: Repository<Plus>,
   ) {}
 
   async findAllByCampaignId(campaignId: string): Promise<any> {
@@ -73,6 +76,46 @@ export class HomeService {
     };
   }
 
+  async findPlusByCampaignId(campaignId: string): Promise<any> {
+    const campaign = await this.campaignRepository.findOne({
+      where: { id: campaignId },
+      relations: ['plus', 'plus.reviews'],
+    });
+
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+
+    const list = campaign.plus.map((plus) => {
+      return {
+        id: plus.id,
+        picture_url: plus.picture_url,
+        name: plus.name,
+        price: plus.price,
+        star_rating: plus.star_rating,
+        reviews_count: plus.reviews_count,
+        lat: plus.lat,
+        lng: plus.lng,
+        verify_info: plus.verify_info,
+        reviews: plus.reviews.map((review) => ({
+          comments: review.comments,
+          localized_date: review.localized_date,
+          reviewer_image_url: review.reviewer_image_url,
+        })),
+      };
+    });
+
+    return {
+      _id: campaign.id,
+      type: campaign.type,
+      title: campaign.title,
+      subtitle: campaign.subtitle,
+      list: list,
+    };
+  }
+
+  // 以下为导数方法
+  // 服务于discount和hotrecommenddest
   async importCampaignData(apiUrl: string): Promise<void> {
     const response = await lastValueFrom(this.httpService.get(apiUrl));
     const campaignData = response.data;
@@ -176,6 +219,63 @@ export class HomeService {
             localized_date: reviewData.localized_date,
             reviewer_image_url: reviewData.reviewer_image_url,
             room: roomData.id,
+          });
+          await this.reviewRepository.save(review);
+        }
+      }
+    }
+  }
+
+  // 服务于highscore
+  async importPlusData(apiUrl: string, campaignId: string): Promise<void> {
+    const response = await lastValueFrom(this.httpService.get(apiUrl));
+    const listData = response.data.list; // 假设数据在 list 字段中
+
+    const campaign = await this.campaignRepository.findOne({
+      where: { id: campaignId },
+    });
+
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+
+    for (const plusData of listData) {
+      const plus = this.plusRepository.create({
+        id: plusData.id,
+        picture_url: plusData.picture_url,
+        name: plusData.name,
+        price: plusData.price,
+        star_rating: plusData.star_rating,
+        reviews_count: plusData.reviews_count,
+        lat: plusData.lat,
+        lng: plusData.lng,
+        verify_info: JSON.stringify(plusData.verify_info),
+      });
+      plus.campaignId = campaignId;
+      await this.plusRepository.save(plus);
+    }
+  }
+
+  async importPlusReviews(apiUrl: string): Promise<void> {
+    const response = await lastValueFrom(this.httpService.get(apiUrl));
+    const roomList = response.data.list;
+
+    for (const roomData of roomList) {
+      const room = await this.plusRepository.findOne({
+        where: { id: roomData.id },
+      });
+
+      if (!room) {
+        // 如果房间不存在，则跳过处理该房间的评论
+        continue;
+      }
+      if (roomData.reviews) {
+        for (const reviewData of roomData.reviews) {
+          const review = this.reviewRepository.create({
+            comments: reviewData.comments,
+            localized_date: reviewData.localized_date,
+            reviewer_image_url: reviewData.reviewer_image_url,
+            room: reviewData.id,
           });
           await this.reviewRepository.save(review);
         }

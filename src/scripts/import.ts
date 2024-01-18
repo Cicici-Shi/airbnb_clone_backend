@@ -5,19 +5,27 @@ import { HomeService } from '../home/home.service';
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);
   const homeService = app.get(HomeService);
-  await homeService.importCampaignData(
-    'http://codercba.com:1888/airbnb/api/home/hotrecommenddest',
-  );
+  // await homeService.importCampaignData(
+  //   'http://codercba.com:1888/airbnb/api/home/highscore',
+  // );
 
-  await homeService.importDestinationNames(
-    'http://codercba.com:1888/airbnb/api/home/hotrecommenddest',
-    '63042a81c591817931daf36b',
-  );
-  await homeService.importRooms(
-    'http://codercba.com:1888/airbnb/api/home/hotrecommenddest',
-  );
-  await homeService.importReviews(
-    'http://codercba.com:1888/airbnb/api/home/hotrecommenddest',
+  // await homeService.importDestinationNames(
+  //   'http://codercba.com:1888/airbnb/api/home/hotrecommenddest',
+  //   '63042a81c591817931daf36b',
+  // );
+  // await homeService.importRooms(
+  //   'http://codercba.com:1888/airbnb/api/home/hotrecommenddest',
+  // );
+  // await homeService.importReviews(
+  //   'http://codercba.com:1888/airbnb/api/home/hotrecommenddest',
+  // );
+
+  // await homeService.importPlusData(
+  //   'http://codercba.com:1888/airbnb/api/home/highscore',
+  //   '630429cbc591817931daf346',
+  // );
+  await homeService.importPlusReviews(
+    'http://codercba.com:1888/airbnb/api/home/highscore',
   );
 
   await app.close();
