@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Destination } from './destination.entity'; // 假设您已经定义了 Destination 实体
+import { Destination } from './destination.entity';
 
 @Entity('campaigns')
 export class Campaign {

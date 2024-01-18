@@ -8,14 +8,18 @@ import {
 import { Destination } from './destination.entity';
 import { Review } from './review.entity';
 import { Picture } from './picture.entity';
-
+import { JoinColumn } from 'typeorm';
 @Entity('room')
 export class Room {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn({ type: 'bigint' })
+  id: string;
 
   @ManyToOne(() => Destination, (destination) => destination.rooms)
+  @JoinColumn({ name: 'destinationId' })
   destination: Destination;
+
+  @Column()
+  destinationId: number;
 
   @Column('varchar', { length: 255 })
   picture_url: string;
@@ -26,7 +30,7 @@ export class Room {
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;
 
-  @Column('int')
+  @Column('int', { nullable: true })
   star_rating: number;
 
   @Column('int')
@@ -37,9 +41,6 @@ export class Room {
 
   @Column('decimal', { precision: 9, scale: 6 })
   lng: number;
-
-  @Column('varchar', { length: 255 })
-  image_url: string;
 
   @Column('text')
   verify_info: string;

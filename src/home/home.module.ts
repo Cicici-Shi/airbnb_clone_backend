@@ -1,12 +1,17 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HomeService } from './home.service';
 import { HomeController } from './home.controller';
 import { Campaign } from './entities/campaign.entity';
+import { Destination } from './entities/destination.entity';
+import { Room } from './entities/room.entity';
+import { Review } from './entities/review.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Campaign]), // 在这里注册 Campaign 实体
+    HttpModule,
+    TypeOrmModule.forFeature([Campaign, Destination, Room, Review]),
   ],
   controllers: [HomeController],
   providers: [HomeService],
