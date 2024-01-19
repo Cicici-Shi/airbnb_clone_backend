@@ -45,7 +45,7 @@ export class Plus {
   @Column('text')
   verify_info: string;
 
-  @OneToMany(() => Review, (review) => review.room)
+  @OneToMany(() => Review, (review) => review.plus)
   reviews: Review[];
 
   @OneToMany(() => Picture, (picture) => picture.room)

@@ -7,6 +7,7 @@ import { Destination } from './entities/destination.entity';
 import { Room } from './entities/room.entity';
 import { Review } from './entities/review.entity';
 import { Plus } from './entities/plus.entity';
+import { City } from './entities/city.entity';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
@@ -23,6 +24,8 @@ export class HomeService {
     private readonly reviewRepository: Repository<Review>,
     @InjectRepository(Plus)
     private readonly plusRepository: Repository<Plus>,
+    @InjectRepository(City)
+    private readonly cityRepository: Repository<City>,
   ) {}
 
   async findAllByCampaignId(campaignId: string): Promise<any> {
@@ -114,8 +117,34 @@ export class HomeService {
     };
   }
 
+  async discoverByCampaignId(campaignId: string): Promise<any> {
+    const campaign = await this.campaignRepository.findOne({
+      where: { id: campaignId },
+      relations: ['cities'],
+    });
+
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+
+    const list = campaign.cities.map((city) => {
+      return {
+        city: city.city,
+        price: city.price,
+        picture_url: city.picture_url,
+      };
+    });
+
+    return {
+      _id: campaign.id,
+      type: campaign.type,
+      title: campaign.title,
+      subtitle: campaign.subtitle,
+      list: list,
+    };
+  }
+
   // 以下为导数方法
-  // 服务于discount和hotrecommenddest
   async importCampaignData(apiUrl: string): Promise<void> {
     const response = await lastValueFrom(this.httpService.get(apiUrl));
     const campaignData = response.data;
@@ -140,6 +169,7 @@ export class HomeService {
     await this.campaignRepository.save(campaign);
   }
 
+  // 服务于discount和hotrecommenddest
   async importDestinationNames(
     apiUrl: string,
     campaignId: string,
@@ -226,7 +256,7 @@ export class HomeService {
     }
   }
 
-  // 服务于highscore
+  // 服务于highscore、goodprice、plus
   async importPlusData(apiUrl: string, campaignId: string): Promise<void> {
     const response = await lastValueFrom(this.httpService.get(apiUrl));
     const listData = response.data.list; // 假设数据在 list 字段中
@@ -275,10 +305,29 @@ export class HomeService {
             comments: reviewData.comments,
             localized_date: reviewData.localized_date,
             reviewer_image_url: reviewData.reviewer_image_url,
-            room: reviewData.id,
+            room: null,
+            plus: roomData.id,
           });
           await this.reviewRepository.save(review);
         }
+      }
+    }
+  }
+
+  async importCities(apiUrl: string): Promise<void> {
+    const response = await lastValueFrom(this.httpService.get(apiUrl));
+    const campaignId = response.data._id;
+    const listData = response.data.list; // 假设数据在 list 字段中
+
+    for (const item of listData) {
+      if (item.city && item.price && item.picture_url) {
+        const city = this.cityRepository.create({
+          city: item.city,
+          price: item.price,
+          picture_url: item.picture_url,
+          campaignId: campaignId,
+        });
+        await this.cityRepository.save(city);
       }
     }
   }

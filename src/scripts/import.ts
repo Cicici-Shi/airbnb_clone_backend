@@ -5,9 +5,9 @@ import { HomeService } from '../home/home.service';
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);
   const homeService = app.get(HomeService);
-  // await homeService.importCampaignData(
-  //   'http://codercba.com:1888/airbnb/api/home/highscore',
-  // );
+  await homeService.importCampaignData(
+    'http://codercba.com:1888/airbnb/api/home/longfor',
+  );
 
   // await homeService.importDestinationNames(
   //   'http://codercba.com:1888/airbnb/api/home/hotrecommenddest',
@@ -21,13 +21,15 @@ async function bootstrap() {
   // );
 
   // await homeService.importPlusData(
-  //   'http://codercba.com:1888/airbnb/api/home/highscore',
-  //   '630429cbc591817931daf346',
+  //   'http://codercba.com:1888/airbnb/api/home/goodprice',
+  //   '630429a1c591817931daf341',
   // );
-  await homeService.importPlusReviews(
-    'http://codercba.com:1888/airbnb/api/home/highscore',
+  // await homeService.importPlusReviews(
+  //   'http://codercba.com:1888/airbnb/api/home/plus',
+  // );
+  await homeService.importCities(
+    'http://codercba.com:1888/airbnb/api/home/longfor',
   );
-
   await app.close();
 }
 

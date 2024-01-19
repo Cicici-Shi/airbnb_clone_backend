@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Room } from './room.entity';
+import { Plus } from './plus.entity';
 
 @Entity('review')
 export class Review {
@@ -8,6 +9,9 @@ export class Review {
 
   @ManyToOne(() => Room, (room) => room.reviews)
   room: Room;
+
+  @ManyToOne(() => Plus, (plus) => plus.reviews)
+  plus: Plus;
 
   @Column('text')
   comments: string;
