@@ -6,7 +6,6 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Review } from './review.entity';
-import { Picture } from './picture.entity';
 import { Campaign } from './campaign.entity';
 import { JoinColumn } from 'typeorm';
 @Entity('plus')
@@ -47,7 +46,4 @@ export class Plus {
 
   @OneToMany(() => Review, (review) => review.plus)
   reviews: Review[];
-
-  @OneToMany(() => Picture, (picture) => picture.room)
-  pictures: Picture[];
 }

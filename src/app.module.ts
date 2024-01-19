@@ -5,11 +5,13 @@ import { AppService } from './app.service';
 import { Campaign } from './home/entities/campaign.entity';
 import { Destination } from './home/entities/destination.entity';
 import { Room } from './home/entities/room.entity';
-import { Picture } from './home/entities/picture.entity';
+import { Picture } from './entire/entities/picture.entity';
 import { Review } from './home/entities/review.entity';
 import { Plus } from './home/entities/plus.entity';
 import { City } from './home/entities/city.entity';
+import { Detail } from './entire/entities/detail.entity';
 import { HomeModule } from './home/home.module';
+import { EntireModule } from './entire/entire.module';
 
 @Module({
   imports: [
@@ -22,7 +24,16 @@ import { HomeModule } from './home/home.module';
       database: 'airbnb_clone',
       synchronize: true,
       logging: true,
-      entities: [Campaign, Destination, Room, Review, Picture, Plus, City],
+      entities: [
+        Campaign,
+        Destination,
+        Room,
+        Review,
+        Picture,
+        Plus,
+        City,
+        Detail,
+      ],
       poolSize: 10,
       connectorPackage: 'mysql2',
       extra: {
@@ -30,6 +41,7 @@ import { HomeModule } from './home/home.module';
       },
     }),
     HomeModule,
+    EntireModule,
   ],
   controllers: [AppController],
   providers: [AppService],

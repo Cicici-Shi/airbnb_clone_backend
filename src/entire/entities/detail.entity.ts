@@ -1,24 +1,10 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  OneToMany,
-} from 'typeorm';
-import { Destination } from './destination.entity';
-import { Review } from './review.entity';
-import { JoinColumn } from 'typeorm';
-@Entity('room')
-export class Room {
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Review } from '../../home/entities/review.entity';
+import { Picture } from './picture.entity';
+@Entity('detail')
+export class Detail {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: string;
-
-  @ManyToOne(() => Destination, (destination) => destination.rooms)
-  @JoinColumn({ name: 'destinationId' })
-  destination: Destination;
-
-  @Column()
-  destinationId: number;
 
   @Column('varchar', { length: 255 })
   picture_url: string;
@@ -44,6 +30,9 @@ export class Room {
   @Column('text')
   verify_info: string;
 
-  @OneToMany(() => Review, (review) => review.room)
+  @OneToMany(() => Review, (review) => review.detail)
   reviews: Review[];
+
+  @OneToMany(() => Picture, (picture) => picture.detail)
+  pictures: Picture[];
 }

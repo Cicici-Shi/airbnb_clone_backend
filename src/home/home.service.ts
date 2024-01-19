@@ -8,6 +8,8 @@ import { Room } from './entities/room.entity';
 import { Review } from './entities/review.entity';
 import { Plus } from './entities/plus.entity';
 import { City } from './entities/city.entity';
+import { Detail } from '../entire/entities/detail.entity';
+import { Picture } from '../entire/entities/picture.entity';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
@@ -26,6 +28,10 @@ export class HomeService {
     private readonly plusRepository: Repository<Plus>,
     @InjectRepository(City)
     private readonly cityRepository: Repository<City>,
+    @InjectRepository(Detail)
+    private readonly detailRepository: Repository<Detail>,
+    @InjectRepository(Picture)
+    private readonly pictureRepository: Repository<Picture>,
   ) {}
 
   async findAllByCampaignId(campaignId: string): Promise<any> {
@@ -291,7 +297,8 @@ export class HomeService {
     const roomList = response.data.list;
 
     for (const roomData of roomList) {
-      const room = await this.plusRepository.findOne({
+      // const room = await this.plusRepository.findOne({
+      const room = await this.detailRepository.findOne({
         where: { id: roomData.id },
       });
 
@@ -306,7 +313,8 @@ export class HomeService {
             localized_date: reviewData.localized_date,
             reviewer_image_url: reviewData.reviewer_image_url,
             room: null,
-            plus: roomData.id,
+            plus: null,
+            detail: roomData.id,
           });
           await this.reviewRepository.save(review);
         }
@@ -314,10 +322,11 @@ export class HomeService {
     }
   }
 
+  // 服务于/home/longfor
   async importCities(apiUrl: string): Promise<void> {
     const response = await lastValueFrom(this.httpService.get(apiUrl));
     const campaignId = response.data._id;
-    const listData = response.data.list; // 假设数据在 list 字段中
+    const listData = response.data.list;
 
     for (const item of listData) {
       if (item.city && item.price && item.picture_url) {
@@ -328,6 +337,44 @@ export class HomeService {
           campaignId: campaignId,
         });
         await this.cityRepository.save(city);
+      }
+    }
+  }
+
+  // 服务于/entire/list
+  async importEntires(apiUrl: string): Promise<void> {
+    const response = await lastValueFrom(this.httpService.get(apiUrl));
+    const listData = response.data.list;
+
+    for (const room of listData) {
+      const entire = this.detailRepository.create({
+        id: room.id,
+        picture_url: room.picture_url,
+        name: room.name,
+        price: room.price,
+        star_rating: room.star_rating,
+        reviews_count: room.reviews_count,
+        lat: room.lat,
+        lng: room.lng,
+        verify_info: JSON.stringify(room.verify_info),
+      });
+      await this.detailRepository.save(entire);
+    }
+  }
+
+  async importPictures(apiUrl: string): Promise<void> {
+    const response = await lastValueFrom(this.httpService.get(apiUrl));
+    const listData = response.data.list;
+
+    for (const item of listData) {
+      const detailId = item.id;
+
+      for (const pictureUrl of item.picture_urls) {
+        const picture = this.pictureRepository.create({
+          detailId: detailId,
+          url: pictureUrl,
+        });
+        await this.pictureRepository.save(picture);
       }
     }
   }
