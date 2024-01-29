@@ -187,7 +187,7 @@ export class HomeService {
     const campaignDestinations = destAddresses.map((dest) => {
       return { name: dest.name, campaignId: campaignId };
     });
-    let index = 1;
+    let index = 9;
     for (const dest of campaignDestinations) {
       const destination = new Destination();
       destination.id = index;
@@ -201,7 +201,7 @@ export class HomeService {
   async importRooms(apiUrl: string): Promise<void> {
     const response = await lastValueFrom(this.httpService.get(apiUrl));
     const destList = response.data.dest_list;
-    let index = 1;
+    let index = 9;
 
     for (const city in destList) {
       const rooms = destList[city];
@@ -212,6 +212,7 @@ export class HomeService {
         if (existingRoom) {
           // 更新数据
           existingRoom.picture_url = roomData.picture_url;
+          existingRoom.destinationId = index;
           await this.roomRepository.save(existingRoom);
         } else {
           // 新建数据
@@ -376,6 +377,28 @@ export class HomeService {
         });
         await this.pictureRepository.save(picture);
       }
+    }
+  }
+
+  async removeDuplicates(): Promise<void> {
+    const duplicates = await this.pictureRepository
+      .createQueryBuilder('p')
+      .innerJoin(
+        (qb) => {
+          return qb
+            .from(Picture, 'p2')
+            .select('detailId, url, MIN(id) as minId')
+            .groupBy('detailId, url')
+            .having('COUNT(*) > 1');
+        },
+        'duplicates',
+        'duplicates.detailId = p.detailId AND duplicates.url = p.url',
+      )
+      .where('p.id != duplicates.minId') // Exclude one record to keep
+      .getMany();
+
+    for (const duplicate of duplicates) {
+      await this.pictureRepository.delete(duplicate.id);
     }
   }
 }

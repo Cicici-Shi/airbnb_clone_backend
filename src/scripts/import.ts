@@ -10,11 +10,12 @@ async function bootstrap() {
   // );
 
   // await homeService.importDestinationNames(
-  //   'http://codercba.com:1888/airbnb/api/home/hotrecommenddest',
-  //   '63042a81c591817931daf36b',
+  //   'http://codercba.com:1888/airbnb/api/home/discount',
+  //   '630428c0c591817931daf312',
   // );
+
   // await homeService.importRooms(
-  //   'http://codercba.com:1888/airbnb/api/home/hotrecommenddest',
+  //   'http://codercba.com:1888/airbnb/api/home/discount',
   // );
   // await homeService.importReviews(
   //   'http://codercba.com:1888/airbnb/api/home/hotrecommenddest',
@@ -33,9 +34,10 @@ async function bootstrap() {
   // await homeService.importEntires(
   //   'http://codercba.com:1888/airbnb/api/entire/list?offset=20&size=300',
   // );
-  await homeService.importPictures(
-    'http://codercba.com:1888/airbnb/api/entire/list?offset=0&size=300',
-  );
+  // await homeService.importPictures(
+  //   'http://codercba.com:1888/airbnb/api/entire/list?offset=0&size=300',
+  // );
+  await homeService.removeDuplicates();
   await app.close();
 }
 
