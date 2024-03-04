@@ -1,73 +1,53 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Airbnb Clone Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## 项目概述
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Airbnb Clone Backend 提供了一套完整的后端服务，专为 [react-airbnb-clone](https://github.com/Cicici-Shi/react-airbnb-clone) 前端项目设计。本服务通过 Nest.js 构建，提供了一系列 RESTful API，用以支持前端展示的各种数据需求。
 
-## Description
+## 主要特性
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **RESTful API**: 提供了一系列的API接口，包括:
+  - `/home/discount`: 获取折扣房源信息
+  - `/home/hotrecommenddest`: 获取热门推荐目的地
+  - `/home/highscore`: 获取高分评价房源
+  - `/home/goodprice`: 获取性价比高的房源
+  - `/home/plus`: 获取 Airbnb Plus 房源
+  - `/home/longfor`: 获取用户长期向往的房源
+- **数据持久化**: 使用 MySQL 数据库存储数据，确保数据的安全和可靠。
+- **性能优化**: 通过 Redis 缓存常见查询，提高应用响应速度。
 
-## Installation
+## 技术栈
+
+- Nest.js
+- TypeORM
+- MySQL
+- Swagger for API documentation
+
+## 安装指南
 
 ```bash
 $ npm install
 ```
 
-## Running the app
+## 运行应用
 
 ```bash
-# development
 $ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
-## Test
+## API 文档 (Swagger)
 
-```bash
-# unit tests
-$ npm run test
+本项目集成了 Swagger，提供了一个交互式的 API 文档。您可以通过访问 `/api-doc` 路径来查看所有可用的 API 端点和相关说明。
 
-# e2e tests
-$ npm run test:e2e
+## 相关链接
 
-# test coverage
-$ npm run test:cov
-```
+- **前端项目**: [react-airbnb-clone](https://github.com/Cicici-Shi/react-airbnb-clone)
+- **后端项目**: [airbnb_clone_backend](https://github.com/Cicici-Shi/airbnb_clone_backend)
 
-## Support
+## 支持与贡献
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+欢迎通过 Issues 或 Pull Requests 提出问题和贡献代码。我们非常感谢任何形式的贡献，帮助我们共同改进项目。
 
-## Stay in touch
+## 许可证
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+本项目采用 [UNLICENSED](LICENSE) 许可证。
