@@ -17,7 +17,9 @@ import { EntireModule } from './entire/entire.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'mysql-container',
+      host: 'localhost',
+      // 使用Docker部署到生产环境时
+      // host: 'mysql-container',
       port: 3306,
       username: 'root',
       password: 'cici',

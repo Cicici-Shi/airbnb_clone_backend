@@ -13,6 +13,7 @@ Airbnb Clone Backend 提供了一套完整的后端服务，专为 [react-airbnb
   - `/home/goodprice`: 获取性价比高的房源
   - `/home/plus`: 获取 Airbnb Plus 房源
   - `/home/longfor`: 获取用户长期向往的房源
+  - `/entire/list`: 通过分页方式获取完整房源列表，支持 `offset` 和 `size` 查询参数
 - **数据持久化**: 使用 MySQL 数据库存储数据，确保数据的安全和可靠。
 - **性能优化**: 通过 Redis 缓存常见查询，提高应用响应速度。
 
@@ -34,10 +35,6 @@ $ npm install
 ```bash
 $ npm run start
 ```
-
-## API 文档 (Swagger)
-
-本项目集成了 Swagger，提供了一个交互式的 API 文档。您可以通过访问 `/api-doc` 路径来查看所有可用的 API 端点和相关说明。
 
 ## 相关链接
 
