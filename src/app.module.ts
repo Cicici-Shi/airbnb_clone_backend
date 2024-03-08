@@ -17,10 +17,10 @@ import { EntireModule } from './entire/entire.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: 'mysql-container',
       port: 3306,
       username: 'root',
-      password: 's2001021',
+      password: 'cici',
       database: 'airbnb_clone',
       synchronize: true,
       logging: true,

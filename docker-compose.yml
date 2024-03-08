@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  nest-app:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    depends_on:
+      - mysql-container
+    ports:
+      - 3001:3001
+    networks:
+      - common-network
+  mysql-container:
+    image: mysql
+    volumes:
+      - /root/mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: airbnb_clone
+      MYSQL_ROOT_PASSWORD: cici
+      ports:
+        - 3306:3306
+    networks:
+      - common-network
+networks:
+  common-network:
+    driver: bridge
