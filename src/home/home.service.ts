@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RedisService } from 'src/redis/redis.service';
 import { Repository } from 'typeorm';
 import { Campaign } from './entities/campaign.entity';
 import { Destination } from './entities/destination.entity';
@@ -32,122 +33,149 @@ export class HomeService {
     private readonly detailRepository: Repository<Detail>,
     @InjectRepository(Picture)
     private readonly pictureRepository: Repository<Picture>,
+    @Inject(RedisService)
+    private redisService: RedisService,
   ) {}
 
   async findAllByCampaignId(campaignId: string): Promise<any> {
-    const campaign = await this.campaignRepository.findOne({
-      where: { id: campaignId },
-    });
+    const cachedData = await this.redisService.get(`campaign_${campaignId}`);
 
-    if (!campaign) {
-      throw new Error('Campaign not found');
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    } else {
+      const campaign = await this.campaignRepository.findOne({
+        where: { id: campaignId },
+      });
+
+      if (!campaign) {
+        throw new Error('Campaign not found');
+      }
+
+      const destinations = await this.destinationRepository.find({
+        where: { campaign: { id: campaignId } },
+        relations: ['rooms', 'rooms.reviews'],
+      });
+      const destAddress = destinations.map((destination) => ({
+        name: destination.name,
+        homes: destination.rooms.map((room) => room.id.toString()), // 假设 room.id 是数字
+      }));
+      const destList = {};
+      destinations.forEach((destination) => {
+        destList[destination.name] = destination.rooms.map((room) => {
+          return {
+            id: room.id.toString(),
+            picture_url: room.picture_url,
+            name: room.name,
+            price: room.price,
+            star_rating: room.star_rating,
+            reviews_count: room.reviews_count,
+            reviews: room.reviews.map((review) => ({
+              comments: review.comments,
+              localized_date: review.localized_date,
+              reviewer_image_url: review.reviewer_image_url,
+            })),
+            lat: room.lat,
+            lng: room.lng,
+            verify_info: room.verify_info,
+          };
+        });
+      });
+
+      const result = {
+        _id: campaign.id.toString(),
+        type: campaign.type,
+        title: campaign.title,
+        subtitle: campaign.subtitle,
+        dest_address: destAddress,
+        dest_list: destList,
+      };
+      this.redisService.set(`campaign_${campaignId}`, JSON.stringify(result));
+      return result;
     }
+  }
 
-    const destinations = await this.destinationRepository.find({
-      where: { campaign: { id: campaignId } },
-      relations: ['rooms', 'rooms.reviews'],
-    });
+  async findPlusByCampaignId(campaignId: string): Promise<any> {
+    const cachedData = await this.redisService.get(`campaign_${campaignId}`);
 
-    const destAddress = destinations.map((destination) => ({
-      name: destination.name,
-      homes: destination.rooms.map((room) => room.id.toString()), // 假设 room.id 是数字
-    }));
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    } else {
+      const campaign = await this.campaignRepository.findOne({
+        where: { id: campaignId },
+        relations: ['plus', 'plus.reviews'],
+      });
 
-    const destList = {};
-    destinations.forEach((destination) => {
-      destList[destination.name] = destination.rooms.map((room) => {
+      if (!campaign) {
+        throw new Error('Campaign not found');
+      }
+
+      const list = campaign.plus.map((plus) => {
         return {
-          id: room.id.toString(),
-          picture_url: room.picture_url,
-          name: room.name,
-          price: room.price,
-          star_rating: room.star_rating,
-          reviews_count: room.reviews_count,
-          reviews: room.reviews.map((review) => ({
+          id: plus.id,
+          picture_url: plus.picture_url,
+          name: plus.name,
+          price: plus.price,
+          star_rating: plus.star_rating,
+          reviews_count: plus.reviews_count,
+          lat: plus.lat,
+          lng: plus.lng,
+          verify_info: plus.verify_info,
+          reviews: plus.reviews.map((review) => ({
             comments: review.comments,
             localized_date: review.localized_date,
             reviewer_image_url: review.reviewer_image_url,
           })),
-          lat: room.lat,
-          lng: room.lng,
-          verify_info: room.verify_info,
         };
       });
-    });
 
-    return {
-      _id: campaign.id.toString(),
-      type: campaign.type,
-      title: campaign.title,
-      subtitle: campaign.subtitle,
-      dest_address: destAddress,
-      dest_list: destList,
-    };
-  }
-
-  async findPlusByCampaignId(campaignId: string): Promise<any> {
-    const campaign = await this.campaignRepository.findOne({
-      where: { id: campaignId },
-      relations: ['plus', 'plus.reviews'],
-    });
-
-    if (!campaign) {
-      throw new Error('Campaign not found');
-    }
-
-    const list = campaign.plus.map((plus) => {
-      return {
-        id: plus.id,
-        picture_url: plus.picture_url,
-        name: plus.name,
-        price: plus.price,
-        star_rating: plus.star_rating,
-        reviews_count: plus.reviews_count,
-        lat: plus.lat,
-        lng: plus.lng,
-        verify_info: plus.verify_info,
-        reviews: plus.reviews.map((review) => ({
-          comments: review.comments,
-          localized_date: review.localized_date,
-          reviewer_image_url: review.reviewer_image_url,
-        })),
+      const result = {
+        _id: campaign.id,
+        type: campaign.type,
+        title: campaign.title,
+        subtitle: campaign.subtitle,
+        list: list,
       };
-    });
-
-    return {
-      _id: campaign.id,
-      type: campaign.type,
-      title: campaign.title,
-      subtitle: campaign.subtitle,
-      list: list,
-    };
+      this.redisService.set(`campaign_${campaignId}`, JSON.stringify(result));
+      return result;
+    }
   }
 
   async discoverByCampaignId(campaignId: string): Promise<any> {
-    const campaign = await this.campaignRepository.findOne({
-      where: { id: campaignId },
-      relations: ['cities'],
-    });
+    const cachedData = await this.redisService.get(`campaign_${campaignId}`);
 
-    if (!campaign) {
-      throw new Error('Campaign not found');
-    }
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    } else {
+      const campaign = await this.campaignRepository.findOne({
+        where: { id: campaignId },
+        relations: ['cities'],
+      });
 
-    const list = campaign.cities.map((city) => {
-      return {
-        city: city.city,
-        price: city.price,
-        picture_url: city.picture_url,
+      if (!campaign) {
+        throw new Error('Campaign not found');
+      }
+
+      const list = campaign.cities.map((city) => {
+        return {
+          city: city.city,
+          price: city.price,
+          picture_url: city.picture_url,
+        };
+      });
+
+      const result = {
+        _id: campaign.id,
+        type: campaign.type,
+        title: campaign.title,
+        subtitle: campaign.subtitle,
+        list: list,
       };
-    });
-
-    return {
-      _id: campaign.id,
-      type: campaign.type,
-      title: campaign.title,
-      subtitle: campaign.subtitle,
-      list: list,
-    };
+      await this.redisService.set(
+        `campaign_${campaignId}`,
+        JSON.stringify(result),
+      );
+      return result;
+    }
   }
 
   // 以下为导数方法

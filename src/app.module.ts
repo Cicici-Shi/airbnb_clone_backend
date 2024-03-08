@@ -12,6 +12,7 @@ import { City } from './home/entities/city.entity';
 import { Detail } from './entire/entities/detail.entity';
 import { HomeModule } from './home/home.module';
 import { EntireModule } from './entire/entire.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { EntireModule } from './entire/entire.module';
     }),
     HomeModule,
     EntireModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],
