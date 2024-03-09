@@ -18,7 +18,7 @@ FROM node:18.0-alpine3.14 as production-stage
 COPY --from=build-stage /app/dist /app
 COPY --from=build-stage /app/package.json /app/package.json
 
-RUN  npm install -g npm@10.5.0
+# RUN  npm install -g npm@10.5.0
 WORKDIR /app
 
 RUN npm config set registry https://registry.npmmirror.com/

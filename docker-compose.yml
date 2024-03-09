@@ -6,6 +6,7 @@ services:
       dockerfile: ./Dockerfile
     depends_on:
       - mysql-container
+      - redis-container
     ports:
       - 3001:3001
     networks:
@@ -17,8 +18,14 @@ services:
     environment:
       MYSQL_DATABASE: airbnb_clone
       MYSQL_ROOT_PASSWORD: cici
-      ports:
-        - 3306:3306
+    ports:
+      - 3306:3306
+    networks:
+      - common-network
+  redis-container:
+    image: redis
+    volumes:
+      - /root/redis:/data
     networks:
       - common-network
 networks:

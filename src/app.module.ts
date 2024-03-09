@@ -18,9 +18,9 @@ import { RedisModule } from './redis/redis.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      // host: 'localhost',
       // 使用Docker部署到生产环境时
-      // host: 'mysql-container',
+      host: 'mysql-container',
       port: 3306,
       username: 'root',
       password: 'cici',
